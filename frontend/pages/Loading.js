@@ -12,9 +12,9 @@ export default function Loading({ navigation }) {
     if (loading) return;
     if (user) {
       navigation.navigate("WoukieBox");
-    } else {
-      navigation.navigate("Login");
+      return;
     }
+    navigation.navigate("Authentication");
   }, [loading, user]);
 
   return (
