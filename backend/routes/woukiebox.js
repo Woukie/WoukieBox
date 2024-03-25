@@ -22,7 +22,6 @@ module.exports = function (app, passport, io) {
           _id: server._id,
           name: server.name,
           owner_id: server.owner_id,
-          channel_ids: server.channel_ids,
           user_ids: server.user_ids,
         };
 
@@ -44,21 +43,21 @@ module.exports = function (app, passport, io) {
   // Delete the server with the given ID if the users ID matches the servers owner_id
   app.post("/servers/delete", authenticate, function (req, res, next) {});
 
-  // Returns the channel data given channel_id if the user is a member of the corresponding server
+  // Returns all channel data in an array, given the server_id, and only if the user is a member of said server
   app.post("/channels/retrieve", authenticate, async function (req, res, next) {
     try {
       const user = req.user;
 
-      const { channel_id } = req.data;
-      if (!channel_id)
+      const { server_id } = req.body;
+      if (!server_id)
         return res.json({
           status: "error",
-          message: "No specified channel id",
+          message: "No specified server id",
         });
 
-      const channel = await Channel.findById(channel_id);
+      const server = await Server.findById(server_id);
 
-      const server = await Server.findById(channel.server_id);
+      console.log(server.user_ids);
 
       if (!server.user_ids.includes(user._id)) {
         return res.json({
@@ -67,12 +66,19 @@ module.exports = function (app, passport, io) {
         });
       }
 
-      const formattedChannel = {
-        _id: channel._id,
-        name: channel.name,
-      };
+      const channels = await Channel.find({ _id: { $in: server.channel_ids } });
 
-      res.json(formattedChannel);
+      const formattedChannels = [];
+      for (const channel of channels) {
+        const formattedChannel = {
+          _id: channel._id,
+          name: channel.name,
+        };
+
+        formattedChannels.push(formattedChannel);
+      }
+
+      res.json(formattedChannels);
     } catch (error) {
       next(error); // Handle errors using Express error handling middleware
     }

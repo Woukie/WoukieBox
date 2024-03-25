@@ -32,23 +32,51 @@ export const WoukieProvider = ({ children }) => {
 
   const { user } = useAuth();
 
-  const fetchServers = () => {
-    if (user) {
-      AxiosInstance.post("/servers/retrieve")
-        .then(function (res) {
-          if (!res || !res.data || res.data.status === "error") {
-            setServers(null);
-          }
+  const fetchChannels = () => {
+    if (!selectedServerID) return;
 
-          console.log("Got servers:");
-          console.log(res.data);
-          setServers(res.data);
-        })
-        .catch(function (error) {
+    AxiosInstance.post("/channels/retrieve", { server_id: selectedServerID })
+      .then(function (res) {
+        if (!res || !res.data || res.data.status === "error") {
+          console.log(
+            `Error occured when fetching channel data for ${channel_id}`
+          );
+          setChannels(null);
+          return;
+        }
+
+        console.log("Got channels:");
+        console.log(res.data);
+        setChannels(res.data);
+        if (res.data[0]) {
+          setSelectedChannelID(res.data[0]._id);
+        } else {
+          setSelectedChannelID(null);
+        }
+      })
+      .catch(function (error) {
+        setChannels(null);
+        console.log(error);
+      });
+  };
+
+  const fetchServers = () => {
+    AxiosInstance.post("/servers/retrieve")
+      .then(function (res) {
+        if (!res || !res.data || res.data.status === "error") {
+          console.log("Error occured when fetching servers");
           setServers(null);
-          console.log(error);
-        });
-    }
+          return;
+        }
+
+        console.log("Got servers:");
+        console.log(res.data);
+        setServers(res.data);
+      })
+      .catch(function (error) {
+        setServers(null);
+        console.log(error);
+      });
   };
 
   useEffect(() => {
@@ -56,8 +84,10 @@ export const WoukieProvider = ({ children }) => {
     fetchServers();
   }, [user]);
 
+  // Fetch channel data when selecting a server
   useEffect(() => {
-    // console.log(servers[selectedServerID]);
+    if (!user) return;
+    fetchChannels();
   }, [selectedServerID]);
 
   useEffect(() => {

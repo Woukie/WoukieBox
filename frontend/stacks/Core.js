@@ -14,7 +14,7 @@ export default function Core({ navigation }) {
   return (
     <NavigationContainer theme={theme}>
       <Appbar.Header elevated={true}>
-        <Appbar.Content title="WoukieBox" />
+        <Appbar.Content title="WoukieBox 2" />
       </Appbar.Header>
       <Stack.Navigator
         initialRouteName="Loading"

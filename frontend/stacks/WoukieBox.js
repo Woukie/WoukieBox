@@ -7,7 +7,6 @@ import Server from "../pages/Server";
 import Profile from "../pages/Profile";
 import { useWoukie } from "../contexts/WoukieContext";
 import { Drawer as PaperDrawer } from "react-native-paper";
-import { View } from "react-native";
 
 const Drawer = createDrawerNavigator();
 
