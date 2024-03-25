@@ -56,7 +56,6 @@ export const WoukieProvider = ({ children }) => {
   }, [user]);
 
   useEffect(() => {
-    console.log(selectedServerID);
     // console.log(servers[selectedServerID]);
   }, [selectedServerID]);
 
@@ -70,6 +69,8 @@ export const WoukieProvider = ({ children }) => {
         servers,
         channels,
         messages,
+        selectedServerID,
+        selectedChannelID,
         setSelectedServerID,
         setSelectedChannelID,
       }}

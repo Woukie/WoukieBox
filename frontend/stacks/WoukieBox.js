@@ -12,41 +12,40 @@ import { View } from "react-native";
 const Drawer = createDrawerNavigator();
 
 export default function WoukieBox({ navigation }) {
-  const { servers } = useWoukie();
+  const { servers, setSelectedServerID } = useWoukie();
 
   const drawerContent = (props) => {
     return (
-      <View>
-        <DrawerContentScrollView style={{ flex: 1 }} {...props}>
-          <PaperDrawer.Section>
-            <PaperDrawer.CollapsedItem
-              key={"Profile"}
-              focusedIcon={"account"}
-              label="Profile"
-              onPress={() => navigation.navigate("Profile")}
-            />
-            <PaperDrawer.CollapsedItem
-              key={"Create Server"}
-              focusedIcon={"plus"}
-              label="Create Server"
-              onPress={() => {}}
-            />
-          </PaperDrawer.Section>
-          <PaperDrawer.Section>
-            {servers &&
-              servers.map((server) => (
-                <PaperDrawer.CollapsedItem
-                  key={server._id}
-                  focusedIcon="earth"
-                  label={server.name}
-                  onPress={() => {
-                    navigation.navigate("Server", server.name);
-                  }}
-                />
-              ))}
-          </PaperDrawer.Section>
-        </DrawerContentScrollView>
-      </View>
+      <DrawerContentScrollView style={{ flex: 1 }} {...props}>
+        <PaperDrawer.Section>
+          <PaperDrawer.CollapsedItem
+            key={"Profile"}
+            focusedIcon={"account"}
+            label="Profile"
+            onPress={() => navigation.navigate("Profile")}
+          />
+          <PaperDrawer.CollapsedItem
+            key={"Create Server"}
+            focusedIcon={"plus"}
+            label="Create Server"
+            onPress={() => {}}
+          />
+        </PaperDrawer.Section>
+        <PaperDrawer.Section>
+          {servers &&
+            servers.map((server) => (
+              <PaperDrawer.CollapsedItem
+                key={server._id}
+                focusedIcon="earth"
+                label={server.name}
+                onPress={() => {
+                  navigation.navigate("Server");
+                  setSelectedServerID(server._id);
+                }}
+              />
+            ))}
+        </PaperDrawer.Section>
+      </DrawerContentScrollView>
     );
   };
 
