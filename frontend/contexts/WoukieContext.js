@@ -52,6 +52,7 @@ export const WoukieProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    if (!user) return;
     fetchServers();
   }, [user]);
 
@@ -60,7 +61,7 @@ export const WoukieProvider = ({ children }) => {
   }, [selectedServerID]);
 
   useEffect(() => {
-    console.log(selectedChannelID);
+    // console.log(selectedChannelID);
   }, [selectedChannelID]);
 
   return (
