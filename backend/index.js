@@ -5,9 +5,26 @@ const passport = require("passport");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const User = require("./schemas/user");
+const { Server } = require("socket.io");
+const http = require("http");
+
+const port = process.env.PORT || 3000;
 
 const app = express();
-const port = process.env.PORT || 3000;
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:8081",
+    credentials: true,
+  },
+});
+
+const sessionMiddleware = require("express-session")({
+  secret: "Q9k5dh2C52rjd5atWeaamq#EM!",
+  resave: false,
+  saveUninitialized: false,
+});
 
 app.use(
   cors({
@@ -17,13 +34,22 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-  require("express-session")({
-    secret: "Q9k5dh2C52rjd5atWeaamq#EM!",
-    resave: false,
-    saveUninitialized: false,
-  })
-);
+app.use(sessionMiddleware);
+
+const wrap = (middleware) => (socket, next) =>
+  middleware(socket.request, {}, next);
+
+io.use(wrap(sessionMiddleware));
+io.use(wrap(passport.initialize()));
+io.use(wrap(passport.session()));
+
+io.use((socket, next) => {
+  if (socket.request.user) {
+    next();
+  } else {
+    next(new Error("unauthorized"));
+  }
+});
 
 mongoose
   .connect(process.env.MONGODB_URI)
@@ -42,78 +68,13 @@ passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-app.post("/auth/user", async function (req, res, next) {
-  if (!req.isAuthenticated()) {
-    return res.send({ status: "error", message: "Not authenticated" });
-  }
-
-  try {
-    const user = await User.findById(req.user);
-    if (!user) {
-      return res.send({ status: "error", message: "User not found" });
-    }
-
-    return res.send({
-      _id: user._id,
-      admin: user.admin,
-      username: user.username,
-      createdAt: user.createdAt,
-    });
-  } catch (error) {
-    return res.send({ status: "error", message: "An error occurred" });
-  }
-});
-
-app.post("/auth/login", function (req, res, next) {
-  passport.authenticate("local", function (err, user, info) {
-    if (err) {
-      return next(err);
-    }
-    if (!user) {
-      return res.send({ status: "error", message: "Invalid credentials" });
-    }
-    req.logIn(user, function (err) {
-      if (err) {
-        return next(err);
-      }
-      return res.send(user);
-    });
-  })(req, res, next);
-});
-
-app.post("/auth/logout", function (req, res, next) {
-  req.logOut(function (err) {
-    if (err) {
-      return res.send({ status: "error", message: err.message });
-    }
-    res.send({ status: "success" });
-  });
-});
-
-app.post("/auth/register", function (req, res, next) {
-  User.register(
-    new User({ username: req.body.username, email: req.body.email }),
-    req.body.password,
-    (err, user) => {
-      if (err)
-        return res.send({
-          status: "error",
-          message: err.message,
-        });
-      req.logIn(user, function (err) {
-        if (err) {
-          return next(err);
-        }
-        return res.send(user);
-      });
-    }
-  );
-});
+require("./routes/authentication")(app, passport);
+require("./routes/woukiebox")(app, passport, io);
 
 app.get("/", (req, res) => {
   res.send("not a big fan of the government");
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
