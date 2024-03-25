@@ -3,6 +3,7 @@ const User = require("../schemas/user");
 const Message = require("../schemas/message");
 const Server = require("../schemas/server");
 const Channel = require("../schemas/channel");
+const { Schema } = require("mongoose");
 
 module.exports = function (app, passport, io) {
   // Returns a message with the given ID if the users ID is in the servers user_ids list of the server the message was sent in
@@ -42,4 +43,38 @@ module.exports = function (app, passport, io) {
 
   // Delete the server with the given ID if the users ID matches the servers owner_id
   app.post("/servers/delete", authenticate, function (req, res, next) {});
+
+  // Returns the channel data given channel_id if the user is a member of the corresponding server
+  app.post("/channels/retrieve", authenticate, async function (req, res, next) {
+    try {
+      const user = req.user;
+
+      const { channel_id } = req.data;
+      if (!channel_id)
+        return res.json({
+          status: "error",
+          message: "No specified channel id",
+        });
+
+      const channel = await Channel.findById(channel_id);
+
+      const server = await Server.findById(channel.server_id);
+
+      if (!server.user_ids.includes(user._id)) {
+        return res.json({
+          status: "error",
+          message: "User is not a member of the server",
+        });
+      }
+
+      const formattedChannel = {
+        _id: channel._id,
+        name: channel.name,
+      };
+
+      res.json(formattedChannel);
+    } catch (error) {
+      next(error); // Handle errors using Express error handling middleware
+    }
+  });
 };
