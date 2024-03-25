@@ -10,7 +10,6 @@ export default function Authentication({ navigation }) {
   const { user } = useAuth();
 
   useEffect(() => {
-    console.log(user);
     if (user) {
       navigation.navigate("WoukieBox");
     }

@@ -15,16 +15,17 @@ module.exports = function (app, passport, io) {
 
       const servers = await Server.find({ _id: { $in: user.server_ids } });
 
-      const formattedServers = {};
+      const formattedServers = [];
       for (const server of servers) {
         const formattedServer = {
           _id: server._id,
           name: server.name,
           owner_id: server.owner_id,
           channel_ids: server.channel_ids,
+          user_ids: server.user_ids,
         };
 
-        formattedServers[server._id] = formattedServer;
+        formattedServers.push(formattedServer);
       }
 
       res.json(formattedServers);

@@ -79,7 +79,7 @@ export const WoukieProvider = ({ children }) => {
   );
 };
 
-export const useSpinner = () => {
+export const useWoukie = () => {
   const context = useContext(WoukieContext);
   if (!context) {
     throw new Error("useWoukie must be used within a WoukieProvider");
