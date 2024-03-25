@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Login from "../pages/login";
-import Register from "../pages/register";
+import Login from "../pages/Login";
+import Register from "../pages/Register";
 import { useEffect } from "react";
 import { useAuth } from "../contexts/AuthenticationContext";
 
