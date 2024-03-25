@@ -7,6 +7,7 @@ import Authentication from "./stacks/Authentication";
 import { SpinnerProvider } from "./contexts/Spinner";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { DialogueProvider } from "./contexts/Dialogue";
+import { WoukieProvider } from "./contexts/WoukieContext";
 
 const Stack = createNativeStackNavigator();
 
@@ -15,20 +16,22 @@ export default function App() {
     <PaperProvider>
       <SpinnerProvider>
         <AuthProvider>
-          <DialogueProvider>
-            <NavigationContainer>
-              <Stack.Navigator
-                initialRouteName="Authentication"
-                screenOptions={{ headerShown: false }}
-              >
-                <Stack.Screen
-                  name="Authentication"
-                  component={Authentication}
-                />
-                <Stack.Screen name="WoukieBox" component={WoukieBox} />
-              </Stack.Navigator>
-            </NavigationContainer>
-          </DialogueProvider>
+          <WoukieProvider>
+            <DialogueProvider>
+              <NavigationContainer>
+                <Stack.Navigator
+                  initialRouteName="Authentication"
+                  screenOptions={{ headerShown: false }}
+                >
+                  <Stack.Screen
+                    name="Authentication"
+                    component={Authentication}
+                  />
+                  <Stack.Screen name="WoukieBox" component={WoukieBox} />
+                </Stack.Navigator>
+              </NavigationContainer>
+            </DialogueProvider>
+          </WoukieProvider>
         </AuthProvider>
       </SpinnerProvider>
     </PaperProvider>

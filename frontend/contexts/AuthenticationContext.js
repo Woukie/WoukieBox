@@ -70,6 +70,7 @@ export const AuthProvider = ({ children }) => {
       if (!response || !response.data || response.data.status === "error") {
         setUser(null);
       } else {
+        console.log("Got user:");
         setUser(response.data);
       }
     } catch (error) {
