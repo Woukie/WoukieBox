@@ -17,8 +17,13 @@ export const AuthProvider = ({ children }) => {
         username,
         password,
       });
-      if (!response || !response.data || response.data.status === "error") {
-        throw new Error("Login failed");
+
+      if (!response || !response.data) {
+        throw new Error("Unknown error...");
+      }
+
+      if (response.data.status === "error") {
+        throw new Error(response.data.message);
       }
 
       checkAuth();
@@ -41,8 +46,13 @@ export const AuthProvider = ({ children }) => {
         email,
         password,
       });
-      if (!response || !response.data || response.data.status === "error") {
-        throw new Error("Registration failed");
+
+      if (!response || !response.data) {
+        throw new Error("Unknown error...");
+      }
+
+      if (response.data.status === "error") {
+        throw new Error(response.data.message);
       }
 
       checkAuth();
@@ -56,6 +66,7 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = async () => {
     try {
       const response = await AxiosInstance.post("/auth/user");
+
       if (!response || !response.data || response.data.status === "error") {
         setUser(null);
       } else {

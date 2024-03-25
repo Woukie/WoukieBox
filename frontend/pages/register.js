@@ -8,6 +8,8 @@ import {
   TextInput,
   useTheme,
 } from "react-native-paper";
+import { useAuth } from "../contexts/AuthenticationContext";
+import { useDialogue } from "../contexts/Dialogue";
 
 export default function Register({ navigation }) {
   const [username, setUsername] = useState("");
@@ -17,6 +19,17 @@ export default function Register({ navigation }) {
   const [hidePassword, setHidePassword] = useState(true);
 
   const theme = useTheme();
+  const dialogue = useDialogue();
+  const { register } = useAuth();
+
+  const handleSubmit = async () => {
+    try {
+      await register(username, email, password);
+      // navigation.navigate("WoukieBox");
+    } catch (error) {
+      dialogue.show("Error!", error.message);
+    }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
@@ -57,7 +70,7 @@ export default function Register({ navigation }) {
         <Button
           mode="contained"
           style={{ ...styles.button, marginBottom: 8 }}
-          onPress={() => {}}
+          onPress={handleSubmit}
         >
           Register
         </Button>

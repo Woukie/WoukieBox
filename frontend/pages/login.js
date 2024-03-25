@@ -1,13 +1,8 @@
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
-import {
-  Button,
-  Divider,
-  Surface,
-  Text,
-  TextInput,
-  useTheme,
-} from "react-native-paper";
+import { Button, Text, TextInput, useTheme } from "react-native-paper";
+import { useAuth } from "../contexts/AuthenticationContext";
+import { useDialogue } from "../contexts/Dialogue";
 
 export default function Login({ navigation }) {
   const [username, setUsername] = useState("");
@@ -16,6 +11,17 @@ export default function Login({ navigation }) {
   const [hidePassword, setHidePassword] = useState(true);
 
   const theme = useTheme();
+  const dialogue = useDialogue();
+  const { login } = useAuth();
+
+  const handleSubmit = async () => {
+    try {
+      await login(username, password);
+      // navigation.navigate("WoukieBox");
+    } catch (error) {
+      dialogue.show("Error!", error.message);
+    }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
@@ -49,7 +55,7 @@ export default function Login({ navigation }) {
         <Button
           mode="contained"
           style={{ ...styles.button, marginBottom: 8 }}
-          onPress={() => {}}
+          onPress={handleSubmit}
         >
           Login
         </Button>

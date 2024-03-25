@@ -1,5 +1,5 @@
 const authenticate = require("../middleware/authenticate");
-const User = require("../models/user");
+const User = require("../schemas/user");
 
 module.exports = function (app, passport) {
   app.post("/auth/user", authenticate, async function (req, res, next) {

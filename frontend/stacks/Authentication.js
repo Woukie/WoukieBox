@@ -1,9 +1,20 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Login from "../pages/login";
 import Register from "../pages/register";
+import { useEffect } from "react";
+import { useAuth } from "../contexts/AuthenticationContext";
 
-export default function Authentication() {
+export default function Authentication({ navigation }) {
   const Stack = createNativeStackNavigator();
+
+  const { user } = useAuth();
+
+  useEffect(() => {
+    console.log(user);
+    if (user) {
+      navigation.navigate("WoukieBox");
+    }
+  }, [user]);
 
   return (
     <Stack.Navigator
