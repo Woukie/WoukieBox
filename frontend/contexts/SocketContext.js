@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "./AuthenticationContext";
+import { useWoukie } from "./WoukieContext";
 
 const SocketContext = createContext();
 
@@ -11,6 +12,16 @@ export const SocketProvider = ({ children }) => {
   const [isConnecting, setIsConnecting] = useState(false);
 
   const { user } = useAuth();
+
+  const {
+    servers,
+    channels,
+    messages,
+    selectedServerID,
+    selectedChannelID,
+    setSelectedServerID,
+    setSelectedChannelID,
+  } = useWoukie();
 
   const connect = async () => {
     const token = await AsyncStorage.getItem("chat-token");
@@ -35,6 +46,10 @@ export const SocketProvider = ({ children }) => {
       setIsConnected(false);
     });
 
+    newSocket.on("message", ({ message, sender }) => {
+      console.log(message, sender);
+    });
+
     setSocket(newSocket);
     newSocket.connect();
   };
@@ -45,7 +60,12 @@ export const SocketProvider = ({ children }) => {
 
   return (
     <SocketContext.Provider
-      value={{ connecting: isConnecting, connected: isConnected, connect }}
+      value={{
+        connecting: isConnecting,
+        connected: isConnected,
+        connect,
+        socket,
+      }}
     >
       {children}
     </SocketContext.Provider>

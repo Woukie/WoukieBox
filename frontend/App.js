@@ -14,11 +14,11 @@ export default function App() {
       <SpinnerProvider>
         <AuthProvider>
           <WoukieProvider>
-            <DialogueProvider>
-              <SocketProvider>
+            <SocketProvider>
+              <DialogueProvider>
                 <Core />
-              </SocketProvider>
-            </DialogueProvider>
+              </DialogueProvider>
+            </SocketProvider>
           </WoukieProvider>
         </AuthProvider>
       </SpinnerProvider>

@@ -52,7 +52,7 @@ module.exports = function (io, jwt) {
 
     socket.on("send_message", (data) => {
       // TODO: Check if user has perms to send message to data.channel
-      io.to(data.channel).emit("on_message", {
+      io.to(data.channel).emit("message", {
         message: data.message,
         sender: socket.userId,
       });
