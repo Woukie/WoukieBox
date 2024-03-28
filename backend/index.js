@@ -2,28 +2,21 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const passport = require("passport");
-const cookieParser = require("cookie-parser");
+const bodyParser = require("body-parser");
 const cors = require("cors");
 const User = require("./schemas/user");
-const { Server } = require("socket.io");
-const http = require("http");
+const jwt = require("jsonwebtoken");
 
 const port = process.env.PORT || 3000;
 
 const app = express();
-const server = http.createServer(app);
+const httpserver = require("http").createServer(app);
 
-const io = new Server(server, {
+const io = require("socket.io")(httpserver, {
   cors: {
     origin: "http://localhost:8081",
     credentials: true,
   },
-});
-
-const sessionMiddleware = require("express-session")({
-  secret: "Q9k5dh2C52rjd5atWeaamq#EM!",
-  resave: false,
-  saveUninitialized: false,
 });
 
 app.use(
@@ -33,29 +26,19 @@ app.use(
   })
 );
 app.use(express.json());
-app.use(cookieParser());
-app.use(sessionMiddleware);
-
-const wrap = (middleware) => (socket, next) =>
-  middleware(socket.request, {}, next);
-
-io.use(wrap(sessionMiddleware));
-io.use(wrap(passport.initialize()));
-io.use(wrap(passport.session()));
-
-io.use((socket, next) => {
-  if (socket.request.user) {
-    next();
-  } else {
-    next(new Error("unauthorized"));
-  }
-});
+app.use(
+  require("express-session")({
+    secret: "Q9k5dh2C52rjd5atWeaamq#EM!",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+app.use(bodyParser.urlencoded({ extended: false }));
 
 mongoose
   .connect(process.env.MONGODB_URI)
   .catch((err) => {
     if (err) {
-      console.log("Gay");
       console.log(err);
     }
   })
@@ -68,13 +51,14 @@ passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-require("./routes/authentication")(app, passport);
-require("./routes/woukiebox")(app, passport, io);
+require("./routes/authentication")(app, passport, jwt);
+require("./routes/woukiebox")(app);
+require("./routes/chat")(io, jwt);
 
 app.get("/", (req, res) => {
   res.send("not a big fan of the government");
 });
 
-server.listen(port, () => {
+httpserver.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });

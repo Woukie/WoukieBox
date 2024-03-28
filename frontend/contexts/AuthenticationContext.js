@@ -1,6 +1,7 @@
 import AxiosInstance from "../AxiosInstance";
-
 import React, { createContext, useState, useContext, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import { useSpinner } from "./Spinner";
 
 const AuthContext = createContext();
@@ -22,9 +23,11 @@ export const AuthProvider = ({ children }) => {
         throw new Error("Unknown error...");
       }
 
-      if (response.data.status === "error") {
+      if (response.data.status === "error" || !response.data.token) {
         throw new Error(response.data.message);
       }
+
+      await AsyncStorage.setItem("chat-token", response.data.token);
 
       checkAuth();
     } catch (error) {
@@ -51,9 +54,11 @@ export const AuthProvider = ({ children }) => {
         throw new Error("Unknown error...");
       }
 
-      if (response.data.status === "error") {
+      if (response.data.status === "error" || !response.data.token) {
         throw new Error(response.data.message);
       }
+
+      await AsyncStorage.setItem("chat-token", response.data.token);
 
       checkAuth();
     } catch (error) {

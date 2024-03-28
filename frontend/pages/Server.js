@@ -15,9 +15,6 @@ export default function Server({ navigation }) {
 
   const serverData = servers.find((server) => server._id === selectedServerID);
 
-  console.log("Displaying server data:");
-  console.log(serverData._id);
-
   return (
     <View style={[styles.root, { backgroundColor: theme.colors.background }]}>
       <Surface style={styles.fakeDrawer} elevation={2}>

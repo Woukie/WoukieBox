@@ -3,9 +3,8 @@ const User = require("../schemas/user");
 const Message = require("../schemas/message");
 const Server = require("../schemas/server");
 const Channel = require("../schemas/channel");
-const { Schema } = require("mongoose");
 
-module.exports = function (app, passport, io) {
+module.exports = function (app) {
   // Returns a message with the given ID if the users ID is in the servers user_ids list of the server the message was sent in
   app.post("/messages/retrieve", authenticate, function (req, res, next) {});
 
@@ -56,8 +55,6 @@ module.exports = function (app, passport, io) {
         });
 
       const server = await Server.findById(server_id);
-
-      console.log(server.user_ids);
 
       if (!server.user_ids.includes(user._id)) {
         return res.json({

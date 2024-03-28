@@ -1,7 +1,8 @@
 const authenticate = require("../middleware/authenticate");
 const User = require("../schemas/user");
 
-module.exports = function (app, passport) {
+module.exports = function (app, passport, jwt) {
+  // Sends user data if user is authenticated
   app.post("/auth/user", authenticate, async function (req, res, next) {
     try {
       const user = await User.findById(req.user);
@@ -20,6 +21,7 @@ module.exports = function (app, passport) {
     }
   });
 
+  // Logs user in with given credentials and returns user data if successfull
   app.post("/auth/login", function (req, res, next) {
     passport.authenticate("local", function (err, user, info) {
       if (err) {
@@ -32,11 +34,21 @@ module.exports = function (app, passport) {
         if (err) {
           return next(err);
         }
-        return res.send(user);
+
+        // Generate JWT for socket.io shit
+        const payload = { userId: user._id };
+        const options = { expiresIn: "1h" };
+        const token = jwt.sign(payload, process.env.JWT_SECRET, options);
+
+        return res.send({
+          status: "success",
+          token,
+        });
       });
     })(req, res, next);
   });
 
+  // Logs user out
   app.post("/auth/logout", function (req, res, next) {
     req.logOut(function (err) {
       if (err) {
@@ -46,6 +58,7 @@ module.exports = function (app, passport) {
     });
   });
 
+  // Registers and logs user in with given credentials and returns user data if successfull
   app.post("/auth/register", function (req, res, next) {
     User.register(
       new User({ username: req.body.username, email: req.body.email }),
@@ -60,7 +73,12 @@ module.exports = function (app, passport) {
           if (err) {
             return next(err);
           }
-          return res.send(user);
+
+          const payload = { userId: user._id };
+          const options = { expiresIn: "1h" };
+          const token = jwt.sign(payload, process.env.JWT_SECRET, options);
+
+          return res.send({ status: "success", token });
         });
       }
     );
