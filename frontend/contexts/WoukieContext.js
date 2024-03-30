@@ -25,43 +25,7 @@ const WoukieContext = createContext();
 export const WoukieProvider = ({ children }) => {
   const [servers, setServers] = useState(null);
   const [channels, setChannels] = useState(null);
-  const [messages, setMessages] = useState([
-    {
-      _id: "some id",
-      sender_id: "some user id",
-      channel_id: "some id",
-      sent_at: new Date(),
-      content: "some message",
-    },
-    {
-      _id: "some id",
-      sender_id: "some user id",
-      channel_id: "some id",
-      sent_at: new Date(),
-      content: "some message",
-    },
-    {
-      _id: "some id",
-      sender_id: "some user id",
-      channel_id: "some id",
-      sent_at: new Date(),
-      content: "some message",
-    },
-    {
-      _id: "some id",
-      sender_id: "some user id",
-      channel_id: "some id",
-      sent_at: new Date(),
-      content: "some message",
-    },
-    {
-      _id: "some id",
-      sender_id: "some user id",
-      channel_id: "some id",
-      sent_at: new Date(),
-      content: "some message",
-    },
-  ]);
+  const [messages, setMessages] = useState([]);
 
   // Example message array:
   // [
@@ -94,7 +58,7 @@ export const WoukieProvider = ({ children }) => {
   const { user } = useAuth();
 
   const fetchChannels = () => {
-    if (!selectedServerID) return;
+    if (!user || !selectedServerID) return;
 
     AxiosInstance.post("/channels/retrieve", { server_id: selectedServerID })
       .then(function (res) {
@@ -121,8 +85,9 @@ export const WoukieProvider = ({ children }) => {
       });
   };
 
-  const fetchServers = () => {
-    AxiosInstance.post("/servers/retrieve")
+  const fetchServers = async () => {
+    if (!user) return;
+    await AxiosInstance.post("/servers/retrieve")
       .then(function (res) {
         if (!res || !res.data || res.data.status === "error") {
           console.log("Error occured when fetching servers");
@@ -141,13 +106,11 @@ export const WoukieProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!user) return;
     fetchServers();
   }, [user]);
 
   // Fetch channel data when selecting a server
   useEffect(() => {
-    if (!user) return;
     fetchChannels();
   }, [selectedServerID]);
 
@@ -165,6 +128,7 @@ export const WoukieProvider = ({ children }) => {
         selectedChannelID,
         setSelectedServerID,
         setSelectedChannelID,
+        fetchServers,
       }}
     >
       {children}

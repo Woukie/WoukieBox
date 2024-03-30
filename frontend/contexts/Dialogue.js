@@ -24,7 +24,7 @@ export const DialogueProvider = ({ children }) => {
           visible={showDialogue}
           onDismiss={() => setShowDialogue(false)}
         >
-          <Surface style={styles.surface}>
+          <Surface elevation={5} style={styles.surface}>
             <Text variant="titleMedium">{title}</Text>
             <Text variant="bodyMedium">{body}</Text>
             <Button onPress={() => setShowDialogue(false)}>Ok</Button>

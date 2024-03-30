@@ -7,6 +7,7 @@ import { WoukieProvider } from "./contexts/WoukieContext";
 import React from "react";
 import Core from "./stacks/Core";
 import { SocketProvider } from "./contexts/SocketContext";
+import { CreateServerDialogueProvider } from "./contexts/CreateServerDialogue";
 
 export default function App() {
   return (

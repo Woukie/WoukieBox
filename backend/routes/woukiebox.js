@@ -36,8 +36,39 @@ module.exports = function (app) {
   // Adds the given server ID to the user and adds the users ID to the servers user list
   app.post("/servers/join", authenticate, function (req, res, next) {});
 
-  // Creates a server with the given name and owner_id matching the users ID
-  app.post("/servers/create", authenticate, function (req, res, next) {});
+  // Creates a server with the given name and user_ids entry + owner_id matching the authoring users ID
+  app.post("/servers/create", authenticate, async function (req, res, next) {
+    try {
+      const user = req.user;
+
+      const { name } = req.body;
+
+      if (!name)
+        return res.json({
+          status: "error",
+          message: "Name required",
+        });
+
+      if (await Server.findOne({ name }))
+        return res.json({
+          status: "error",
+          message: "Name in use",
+        });
+
+      const server = await Server.create({
+        name,
+        owner_id: user._id,
+        user_ids: [user._id],
+      });
+
+      user.server_ids.push(server._id);
+      user.save();
+
+      res.json({ status: "success", server_id: server._id });
+    } catch (error) {
+      next(error); // Handle errors using Express error handling middleware
+    }
+  });
 
   // Delete the server with the given ID if the users ID matches the servers owner_id
   app.post("/servers/delete", authenticate, function (req, res, next) {});

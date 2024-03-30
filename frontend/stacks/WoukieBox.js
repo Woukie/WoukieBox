@@ -7,11 +7,13 @@ import Server from "../pages/Server";
 import Profile from "../pages/Profile";
 import { useWoukie } from "../contexts/WoukieContext";
 import { Drawer as PaperDrawer } from "react-native-paper";
+import { useCreateServerDialogue } from "../contexts/CreateServerDialogue";
 
 const Drawer = createDrawerNavigator();
 
 export default function WoukieBox({ navigation }) {
   const { servers, setSelectedServerID } = useWoukie();
+  const createServerDialogue = useCreateServerDialogue();
 
   const drawerContent = (props) => {
     return (
@@ -27,7 +29,9 @@ export default function WoukieBox({ navigation }) {
             key={"Create Server"}
             focusedIcon={"plus"}
             label="Create Server"
-            onPress={() => {}}
+            onPress={() => {
+              createServerDialogue.show();
+            }}
           />
         </PaperDrawer.Section>
         <PaperDrawer.Section>

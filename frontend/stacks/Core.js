@@ -5,6 +5,7 @@ import WoukieBox from "../stacks/WoukieBox";
 import Authentication from "../stacks/Authentication";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Loading from "../pages/Loading";
+import { CreateServerDialogueProvider } from "../contexts/CreateServerDialogue";
 
 const Stack = createNativeStackNavigator();
 
@@ -13,17 +14,19 @@ export default function Core({ navigation }) {
 
   return (
     <NavigationContainer theme={theme}>
-      <Appbar.Header elevated={true}>
-        <Appbar.Content title="WoukieBox 2" />
-      </Appbar.Header>
-      <Stack.Navigator
-        initialRouteName="Loading"
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="Authentication" component={Authentication} />
-        <Stack.Screen name="WoukieBox" component={WoukieBox} />
-        <Stack.Screen name="Loading" component={Loading} />
-      </Stack.Navigator>
+      <CreateServerDialogueProvider>
+        <Appbar.Header elevated={true}>
+          <Appbar.Content title="WoukieBox 2" />
+        </Appbar.Header>
+        <Stack.Navigator
+          initialRouteName="Loading"
+          screenOptions={{ headerShown: false }}
+        >
+          <Stack.Screen name="Authentication" component={Authentication} />
+          <Stack.Screen name="WoukieBox" component={WoukieBox} />
+          <Stack.Screen name="Loading" component={Loading} />
+        </Stack.Navigator>
+      </CreateServerDialogueProvider>
     </NavigationContainer>
   );
 }
