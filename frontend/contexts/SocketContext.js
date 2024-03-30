@@ -37,6 +37,10 @@ export const SocketProvider = ({ children }) => {
       },
     });
 
+    newSocket.onAny((eventName, ...args) => {
+      console.log(eventName);
+    });
+
     newSocket.on("connect", () => {
       setIsConnected(true);
       setIsConnecting(false);
@@ -46,8 +50,13 @@ export const SocketProvider = ({ children }) => {
       setIsConnected(false);
     });
 
-    newSocket.on("message", ({ message, sender }) => {
-      console.log(message, sender);
+    newSocket.on("message", (data, callback) => {
+      const { content, sender_id, channel_id, sent_at } = data;
+      console.log("MESSAGE RECIEVED:");
+      console.log(content);
+      console.log(sender_id);
+      console.log(channel_id);
+      console.log(sent_at);
     });
 
     setSocket(newSocket);

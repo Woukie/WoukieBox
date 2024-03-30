@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 import {
   ActivityIndicator,
   Button,
@@ -38,7 +38,28 @@ export default function Chat() {
 
   const theme = useTheme();
   const { connected, socket } = useSocket();
-  const { selectedChannelID } = useWoukie();
+  const { selectedChannelID, messages } = useWoukie();
+
+  const renderMessage = (data) => {
+    const { _id, sender_id, channel_id, sent_at, content } = data.item;
+    return (
+      <TouchableOpacity style={{ width: "100%" }} onPress={() => {}}>
+        <Text>{content}</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const sendMessage = () => {
+    socket.emit(
+      "message",
+      { content: message, channel_id: selectedChannelID },
+      (response) => {
+        if (response === "success") {
+          setMessage("");
+        }
+      }
+    );
+  };
 
   useEffect(() => {
     setPlaceHolder(randomPlaceholder());
@@ -48,28 +69,35 @@ export default function Chat() {
 
   return (
     <View style={{ flex: 1 }}>
-      <View style={styles.root}>
-        {connected ? (
-          selectedChannelID ? (
-            <Text variant="titleMedium">Connected!</Text>
-          ) : (
-            <Text variant="titleMedium">le no chnanels on serer...</Text>
-          )
-        ) : (
+      {connected ? (
+        <FlatList inverted data={messages} renderItem={renderMessage} />
+      ) : (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignSelf: "center",
+          }}
+        >
           <View>
             <ActivityIndicator size="large" />
             <Text style={{ padding: 16 }} variant="titleMedium">
               Connecting...
             </Text>
           </View>
-        )}
-      </View>
+        </View>
+      )}
 
-      {/* I hate this more than you think :) */}
-      <View style={{ flexDirection: "row", alignContent: "flex-end" }}>
-        <Surface elevation={2} style={{ flex: 1, padding: 0 }}>
+      <Surface
+        style={{
+          flexDirection: "row",
+          alignContent: "flex-end",
+        }}
+      >
+        <View style={{ flex: 1, padding: 0 }}>
           <Textarea
             maxLength={3000}
+            value={message}
             onChange={(e) => {
               setMessage(e.target.value);
             }}
@@ -83,28 +111,29 @@ export default function Chat() {
               letterSpacing: font.letterSpacing,
               outline: "none",
             }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+              }
+            }}
           />
-        </Surface>
+        </View>
         <Button
           mode="contained-tonal"
           icon="send"
-          onPress={() => {}}
-          style={{ borderRadius: 0 }}
+          onPress={sendMessage}
+          style={{ height: 46, alignSelf: "flex-end" }}
           contentStyle={(styles.flexReverse, { height: 46 })}
         >
           Send
         </Button>
-      </View>
+      </Surface>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    justifyContent: "center",
-    alignSelf: "center",
-  },
   input: {
     maxHeight: "300px",
     display: "block",

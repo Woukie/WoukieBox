@@ -50,19 +50,23 @@ module.exports = function (io, jwt) {
       // Idfk
     }
 
-    socket.on("send_message", (data) => {
+    socket.on("message", (data, callback) => {
       // TODO: Check if user has perms to send message to data.channel
-      io.to(data.channel).emit("message", {
-        message: data.message,
-        sender: socket.userId,
+
+      if (!data.channel_id) return callback("no channel_id");
+      if (!data.content) return callback("no content");
+
+      io.to(data.channel_id).emit("message", {
+        channel_id: data.channel_id,
+        content: data.content,
+        sender_id: socket.user._id,
+        sent_at: Date.now(),
       });
 
+      callback("success");
+
       console.log(
-        socket.user.username +
-          " sent message '" +
-          data.message +
-          "' to " +
-          data.room
+        `${socket.user.username} sent '${data.content}' to ${data.channel_id}`
       );
     });
 

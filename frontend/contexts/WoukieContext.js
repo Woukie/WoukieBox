@@ -25,7 +25,68 @@ const WoukieContext = createContext();
 export const WoukieProvider = ({ children }) => {
   const [servers, setServers] = useState(null);
   const [channels, setChannels] = useState(null);
-  const [messages, setMessages] = useState(null);
+  const [messages, setMessages] = useState([
+    {
+      _id: "some id",
+      sender_id: "some user id",
+      channel_id: "some id",
+      sent_at: new Date(),
+      content: "some message",
+    },
+    {
+      _id: "some id",
+      sender_id: "some user id",
+      channel_id: "some id",
+      sent_at: new Date(),
+      content: "some message",
+    },
+    {
+      _id: "some id",
+      sender_id: "some user id",
+      channel_id: "some id",
+      sent_at: new Date(),
+      content: "some message",
+    },
+    {
+      _id: "some id",
+      sender_id: "some user id",
+      channel_id: "some id",
+      sent_at: new Date(),
+      content: "some message",
+    },
+    {
+      _id: "some id",
+      sender_id: "some user id",
+      channel_id: "some id",
+      sent_at: new Date(),
+      content: "some message",
+    },
+  ]);
+
+  // Example message array:
+  // [
+  //   {
+  //     _id: "some id",
+  //     sender_id: "some user id",
+  //     channel_id: "some id",
+  //     sent_at: new Date(),
+  //     content: "some message",
+  //   },
+  //   {
+  //     _id: "some id",
+  //     sender_id: "some user id",
+  //     channel_id: "some id",
+  //     sent_at: new Date(),
+  //     content: "some message",
+  //   },
+  //   {
+  //     _id: "some id",
+  //     sender_id: "some user id",
+  //     channel_id: "some id",
+  //     sent_at: new Date(),
+  //     content: "some message",
+  //   },
+  // ];
 
   const [selectedServerID, setSelectedServerID] = useState("");
   const [selectedChannelID, setSelectedChannelID] = useState("");
