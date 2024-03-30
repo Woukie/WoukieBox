@@ -57,10 +57,12 @@ export const WoukieProvider = ({ children }) => {
 
   const { user } = useAuth();
 
-  const fetchChannels = () => {
+  const fetchChannels = async () => {
     if (!user || !selectedServerID) return;
 
-    AxiosInstance.post("/channels/retrieve", { server_id: selectedServerID })
+    await AxiosInstance.post("/channels/retrieve", {
+      server_id: selectedServerID,
+    })
       .then(function (res) {
         if (!res || !res.data || res.data.status === "error") {
           console.log(
@@ -129,6 +131,7 @@ export const WoukieProvider = ({ children }) => {
         setSelectedServerID,
         setSelectedChannelID,
         fetchServers,
+        fetchChannels,
       }}
     >
       {children}

@@ -73,6 +73,44 @@ module.exports = function (app) {
   // Delete the server with the given ID if the users ID matches the servers owner_id
   app.post("/servers/delete", authenticate, function (req, res, next) {});
 
+  // Creates a channel with the given name
+  app.post("/channels/create", authenticate, async function (req, res, next) {
+    try {
+      const user = req.user;
+
+      const { name, server_id, voice } = req.body;
+      if (!server_id)
+        return res.json({
+          status: "error",
+          message: "No specified server id",
+        });
+
+      if (!name)
+        return res.json({
+          status: "error",
+          message: "Name required",
+        });
+
+      const server = await Server.findById(server_id);
+
+      // It dont work if i dont convert to string
+      if (server.owner_id.toString() !== user._id.toString()) {
+        return res.json({
+          status: "error",
+          message: "Unauthorized",
+        });
+      }
+
+      const channel = await Channel.create({ name, voice });
+      server.channel_ids.push(channel._id);
+      server.save();
+
+      res.json({ status: "success", channel_id: channel._id });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   // Returns all channel data in an array, given the server_id, and only if the user is a member of said server
   app.post("/channels/retrieve", authenticate, async function (req, res, next) {
     try {
@@ -101,6 +139,7 @@ module.exports = function (app) {
         const formattedChannel = {
           _id: channel._id,
           name: channel.name,
+          voice: channel.voice || false,
         };
 
         formattedChannels.push(formattedChannel);
