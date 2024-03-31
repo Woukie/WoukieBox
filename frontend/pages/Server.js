@@ -19,6 +19,10 @@ export default function Server({ navigation }) {
   } = useWoukie();
 
   const serverData = servers.find((server) => server._id === selectedServerID);
+  const textChannels =
+    serverData && channels && channels.filter((channel) => !channel.voice);
+  const voiceChannels =
+    serverData && channels && channels.filter((channel) => channel.voice);
 
   return (
     <View style={[styles.root, { backgroundColor: theme.colors.background }]}>
@@ -26,33 +30,6 @@ export default function Server({ navigation }) {
         {serverData && channels && (
           <ScrollView>
             <Drawer.Section title={serverData.name || ""} />
-            <Drawer.Section title="Text Channels">
-              {channels
-                .filter((channel) => !channel.voice)
-                .map((channel) => (
-                  <Drawer.Item
-                    key={channel._id}
-                    active={channel._id === selectedChannelID}
-                    icon="chat"
-                    label={channel.name}
-                    onPress={() => setSelectedChannelID(channel._id)}
-                  />
-                ))}
-            </Drawer.Section>
-
-            <Drawer.Section title="Voice Channels">
-              {channels
-                .filter((channel) => channel.voice)
-                .map((channel) => (
-                  <Drawer.Item
-                    key={channel._id}
-                    active={channel._id === selectedChannelID}
-                    icon="microphone"
-                    label={channel.name}
-                    onPress={() => setSelectedChannelID(channel._id)}
-                  />
-                ))}
-            </Drawer.Section>
 
             {serverData.owner_id && serverData.owner_id === user._id && (
               <Drawer.Section>
@@ -72,12 +49,34 @@ export default function Server({ navigation }) {
                     createChannelDialogue.show(serverData._id, true);
                   }}
                 />
-                <Drawer.Item
-                  key={"Invite"}
-                  icon="account-plus"
-                  label={"Invite Link"}
-                  onPress={() => {}}
-                />
+              </Drawer.Section>
+            )}
+
+            {textChannels.length > 0 && (
+              <Drawer.Section>
+                {textChannels.map((channel) => (
+                  <Drawer.Item
+                    key={channel._id}
+                    active={channel._id === selectedChannelID}
+                    icon="chat"
+                    label={channel.name}
+                    onPress={() => setSelectedChannelID(channel._id)}
+                  />
+                ))}
+              </Drawer.Section>
+            )}
+
+            {voiceChannels.length > 0 && (
+              <Drawer.Section>
+                {voiceChannels.map((channel) => (
+                  <Drawer.Item
+                    key={channel._id}
+                    active={channel._id === selectedChannelID}
+                    icon="microphone"
+                    label={channel.name}
+                    onPress={() => setSelectedChannelID(channel._id)}
+                  />
+                ))}
               </Drawer.Section>
             )}
           </ScrollView>

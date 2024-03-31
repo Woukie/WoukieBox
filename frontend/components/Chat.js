@@ -88,47 +88,49 @@ export default function Chat() {
         </View>
       )}
 
-      <Surface
-        style={{
-          flexDirection: "row",
-          alignContent: "flex-end",
-        }}
-      >
-        <View style={{ flex: 1, padding: 0 }}>
-          <Textarea
-            maxLength={3000}
-            value={message}
-            onChange={(e) => {
-              setMessage(e.target.value);
-            }}
-            placeholder={placeholder}
-            style={{
-              ...styles.input,
-              fontFamily: font.fontFamily,
-              fontSize: font.fontSize,
-              fontStyle: font.fontStyle,
-              fontWeight: font.fontWeight,
-              letterSpacing: font.letterSpacing,
-              outline: "none",
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                sendMessage();
-              }
-            }}
-          />
-        </View>
-        <Button
-          mode="contained-tonal"
-          icon="send"
-          onPress={sendMessage}
-          style={{ height: 46, alignSelf: "flex-end" }}
-          contentStyle={(styles.flexReverse, { height: 46 })}
+      {selectedChannelID && (
+        <Surface
+          style={{
+            flexDirection: "row",
+            alignContent: "flex-end",
+          }}
         >
-          Send
-        </Button>
-      </Surface>
+          <View style={{ flex: 1, padding: 0 }}>
+            <Textarea
+              maxLength={3000}
+              value={message}
+              onChange={(e) => {
+                setMessage(e.target.value);
+              }}
+              placeholder={placeholder}
+              style={{
+                ...styles.input,
+                fontFamily: font.fontFamily,
+                fontSize: font.fontSize,
+                fontStyle: font.fontStyle,
+                fontWeight: font.fontWeight,
+                letterSpacing: font.letterSpacing,
+                outline: "none",
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault();
+                  sendMessage();
+                }
+              }}
+            />
+          </View>
+          <Button
+            mode="contained-tonal"
+            icon="send"
+            onPress={sendMessage}
+            style={{ height: 46, alignSelf: "flex-end" }}
+            contentStyle={(styles.flexReverse, { height: 46 })}
+          >
+            Send
+          </Button>
+        </Surface>
+      )}
     </View>
   );
 }

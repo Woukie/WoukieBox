@@ -7,6 +7,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Loading from "../pages/Loading";
 import { CreateServerDialogueProvider } from "../contexts/CreateServerDialogue";
 import { CreateChannelDialogueProvider } from "../contexts/CreateChannelDialogue";
+import { JoinServerDialogueProvider } from "../contexts/JoinServerDialogue";
 
 const Stack = createNativeStackNavigator();
 
@@ -17,17 +18,19 @@ export default function Core({ navigation }) {
     <NavigationContainer theme={theme}>
       <CreateServerDialogueProvider>
         <CreateChannelDialogueProvider>
-          <Appbar.Header elevated={true}>
-            <Appbar.Content title="WoukieBox 2" />
-          </Appbar.Header>
-          <Stack.Navigator
-            initialRouteName="Loading"
-            screenOptions={{ headerShown: false }}
-          >
-            <Stack.Screen name="Authentication" component={Authentication} />
-            <Stack.Screen name="WoukieBox" component={WoukieBox} />
-            <Stack.Screen name="Loading" component={Loading} />
-          </Stack.Navigator>
+          <JoinServerDialogueProvider>
+            <Appbar.Header elevated={true}>
+              <Appbar.Content title="WoukieBox 2" />
+            </Appbar.Header>
+            <Stack.Navigator
+              initialRouteName="Loading"
+              screenOptions={{ headerShown: false }}
+            >
+              <Stack.Screen name="Authentication" component={Authentication} />
+              <Stack.Screen name="WoukieBox" component={WoukieBox} />
+              <Stack.Screen name="Loading" component={Loading} />
+            </Stack.Navigator>
+          </JoinServerDialogueProvider>
         </CreateChannelDialogueProvider>
       </CreateServerDialogueProvider>
     </NavigationContainer>

@@ -8,12 +8,14 @@ import Profile from "../pages/Profile";
 import { useWoukie } from "../contexts/WoukieContext";
 import { Drawer as PaperDrawer } from "react-native-paper";
 import { useCreateServerDialogue } from "../contexts/CreateServerDialogue";
+import { useJoinServerDialogue } from "../contexts/JoinServerDialogue";
 
 const Drawer = createDrawerNavigator();
 
 export default function WoukieBox({ navigation }) {
   const { servers, setSelectedServerID } = useWoukie();
   const createServerDialogue = useCreateServerDialogue();
+  const joinServerDialogue = useJoinServerDialogue();
 
   const drawerContent = (props) => {
     return (
@@ -27,10 +29,18 @@ export default function WoukieBox({ navigation }) {
           />
           <PaperDrawer.CollapsedItem
             key={"Create Server"}
-            focusedIcon={"plus"}
+            focusedIcon={"earth-plus"}
             label="Create Server"
             onPress={() => {
               createServerDialogue.show();
+            }}
+          />
+          <PaperDrawer.CollapsedItem
+            key={"Join Server"}
+            focusedIcon={"account-multiple-plus"}
+            label="Join Server"
+            onPress={() => {
+              joinServerDialogue.show();
             }}
           />
         </PaperDrawer.Section>

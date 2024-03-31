@@ -33,9 +33,6 @@ module.exports = function (app) {
     }
   });
 
-  // Adds the given server ID to the user and adds the users ID to the servers user list
-  app.post("/servers/join", authenticate, function (req, res, next) {});
-
   // Creates a server with the given name and user_ids entry + owner_id matching the authoring users ID
   app.post("/servers/create", authenticate, async function (req, res, next) {
     try {
@@ -72,6 +69,44 @@ module.exports = function (app) {
 
   // Delete the server with the given ID if the users ID matches the servers owner_id
   app.post("/servers/delete", authenticate, function (req, res, next) {});
+
+  // Joins the server with the given name
+  app.post("/servers/join", authenticate, async function (req, res, next) {
+    try {
+      const name = req.body.name;
+      const user = req.user;
+
+      if (!name)
+        return res.json({
+          status: "error",
+          message: "Must specify name",
+        });
+
+      const server = await Server.findOne({ name });
+
+      if (!server)
+        return res.json({
+          status: "error",
+          message: "Server does not exist",
+        });
+
+      if (server.user_ids.includes(user._id))
+        return res.json({
+          status: "error",
+          message: "Already in server",
+        });
+
+      server.user_ids.push(user._id);
+      user.server_ids.push(server._id);
+      user.save();
+      server.save();
+
+      res.json({ status: "success", server_id: server._id });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  });
 
   // Creates a channel with the given name
   app.post("/channels/create", authenticate, async function (req, res, next) {
