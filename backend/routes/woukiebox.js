@@ -136,7 +136,7 @@ module.exports = function (app) {
         });
       }
 
-      const channel = await Channel.create({ name, voice });
+      const channel = await Channel.create({ name, voice, server_id });
       server.channel_ids.push(channel._id);
       server.save();
 

@@ -128,6 +128,7 @@ export const WoukieProvider = ({ children }) => {
         messages,
         selectedServerID,
         selectedChannelID,
+        setMessages,
         setSelectedServerID,
         setSelectedChannelID,
         fetchServers,

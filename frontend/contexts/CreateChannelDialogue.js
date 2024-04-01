@@ -13,7 +13,7 @@ import {
 import AxiosInstance from "../AxiosInstance";
 import { useSpinner } from "./Spinner";
 import { useWoukie } from "./WoukieContext";
-import { useNavigation } from "@react-navigation/native";
+import { useSocket } from "./SocketContext";
 
 const CreateChannelDialogueContext = createContext();
 
@@ -26,6 +26,7 @@ export const CreateChannelDialogueProvider = ({ children }) => {
 
   const { setShowSpinner } = useSpinner();
   const { fetchChannels, setSelectedChannelID } = useWoukie();
+  const { socket } = useSocket();
 
   const show = (server_id, voice) => {
     console.log(server_id);
@@ -53,6 +54,13 @@ export const CreateChannelDialogueProvider = ({ children }) => {
         await fetchChannels();
         setSelectedChannelID(response.data.channel_id);
         setVisible(false);
+        socket.emit(
+          "join_channel",
+          { channel_id: response.data.channel_id },
+          (response) => {
+            console.log(response);
+          }
+        );
       } else if (response.data.message) {
         setError(response.data.message);
       }

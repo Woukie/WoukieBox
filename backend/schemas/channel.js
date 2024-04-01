@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const Channel = new Schema({
   name: { type: String, require: true },
   voice: { type: Boolean, default: false, require: true },
+  server_id: { type: Schema.Types.ObjectId, require: true },
   last_message_id: { type: Schema.Types.ObjectId },
 });
 

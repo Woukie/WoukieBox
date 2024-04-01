@@ -12,16 +12,7 @@ export const SocketProvider = ({ children }) => {
   const [isConnecting, setIsConnecting] = useState(false);
 
   const { user } = useAuth();
-
-  const {
-    servers,
-    channels,
-    messages,
-    selectedServerID,
-    selectedChannelID,
-    setSelectedServerID,
-    setSelectedChannelID,
-  } = useWoukie();
+  const { messages, setMessages } = useWoukie();
 
   const connect = async () => {
     const token = await AsyncStorage.getItem("chat-token");
@@ -51,12 +42,8 @@ export const SocketProvider = ({ children }) => {
     });
 
     newSocket.on("message", (data, callback) => {
-      const { content, sender_id, channel_id, sent_at } = data;
-      console.log("MESSAGE RECIEVED:");
-      console.log(content);
-      console.log(sender_id);
-      console.log(channel_id);
-      console.log(sent_at);
+      const { parent_id, content, sender_id, channel_id, sent_at } = data;
+      setMessages((messages) => [data, ...messages]);
     });
 
     setSocket(newSocket);

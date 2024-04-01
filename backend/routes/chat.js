@@ -51,6 +51,27 @@ module.exports = function (io, jwt) {
       // Idfk
     }
 
+    socket.on("join_channel", async (data, callback) => {
+      const user = socket.user;
+
+      if (!data.channel_id) {
+        callback("no channel_id");
+        return;
+      }
+
+      const channel = await Channel.findById(data.channel_id);
+      const server = await Server.findById(channel.server_id);
+
+      if (!server.user_ids.includes(user._id)) {
+        callback("Not authorized");
+        return;
+      }
+
+      socket.join(channel._id.toString());
+      console.log(`${socket.user.username} joined ${channel._id}`);
+      callback("joined channel");
+    });
+
     socket.on("message", async (data, callback) => {
       // TODO: Check if user has perms to send message to data.channel
 
@@ -82,6 +103,7 @@ module.exports = function (io, jwt) {
       newMessage.save();
 
       io.to(data.channel_id).emit("message", {
+        _id: newMessage._id,
         parent_id: newMessage.parent_id,
         sender_id: newMessage.sender_id,
         channel_id: newMessage._id,
