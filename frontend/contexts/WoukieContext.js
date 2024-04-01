@@ -117,7 +117,7 @@ export const WoukieProvider = ({ children }) => {
   }, [selectedServerID]);
 
   useEffect(() => {
-    // console.log(selectedChannelID);
+    setMessages([]);
   }, [selectedChannelID]);
 
   return (
