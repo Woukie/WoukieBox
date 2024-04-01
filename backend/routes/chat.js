@@ -1,6 +1,7 @@
 const Server = require("../schemas/server");
 const User = require("../schemas/user");
 const Channel = require("../schemas/channel");
+const Message = require("../schemas/message");
 
 module.exports = function (io, jwt) {
   // Auth middleware
@@ -41,7 +42,7 @@ module.exports = function (io, jwt) {
         });
 
         for (const channel of channels) {
-          socket.join(channel._id);
+          socket.join(channel._id.toString());
           console.log(`${socket.user.username} joined ${channel._id}`);
         }
       }
@@ -50,17 +51,42 @@ module.exports = function (io, jwt) {
       // Idfk
     }
 
-    socket.on("message", (data, callback) => {
+    socket.on("message", async (data, callback) => {
       // TODO: Check if user has perms to send message to data.channel
+
+      const user = socket.user;
 
       if (!data.channel_id) return callback("no channel_id");
       if (!data.content) return callback("no content");
 
-      io.to(data.channel_id).emit("message", {
+      const channel = await Channel.findById(data.channel_id);
+
+      const newMessage = await Message.create({
+        parent_id: channel.last_message_id || null,
+        sender_id: user._id,
         channel_id: data.channel_id,
         content: data.content,
-        sender_id: socket.user._id,
-        sent_at: Date.now(),
+      });
+
+      // Update previous messages child to point to new message
+      const lastMessage = await Message.findById(channel.last_message_id);
+      if (lastMessage) {
+        lastMessage.child_id = newMessage._id;
+        lastMessage.save();
+      }
+
+      // Update channels latest message
+      channel.last_message_id = newMessage._id;
+      channel.save();
+
+      newMessage.save();
+
+      io.to(data.channel_id).emit("message", {
+        parent_id: newMessage.parent_id,
+        sender_id: newMessage.sender_id,
+        channel_id: newMessage._id,
+        sent_at: newMessage.sent_at,
+        content: newMessage.content,
       });
 
       callback("success");
