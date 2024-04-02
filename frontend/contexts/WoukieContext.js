@@ -26,6 +26,7 @@ export const WoukieProvider = ({ children }) => {
   const [servers, setServers] = useState(null);
   const [channels, setChannels] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [loadingMessageHistory, setLoadingMessageHistory] = useState(false);
 
   // Example message array:
   // [
@@ -116,8 +117,63 @@ export const WoukieProvider = ({ children }) => {
     fetchChannels();
   }, [selectedServerID]);
 
+  // TEMP: continually loads message history until no more parent messages
+  // TODO: Make this load x messages when having scrolled the entire screen, could even be a "load more" button for simplicity on my part
+  // TODO: Load in batches of x messages (change on server as well)
   useEffect(() => {
-    setMessages([]);
+    if (
+      !loadingMessageHistory &&
+      messages.length != 0 &&
+      messages[0].parent_id
+    ) {
+      setLoadingMessageHistory(true);
+
+      AxiosInstance.post("/messages/retrieve", {
+        message_id: messages[messages.length - 1].parent_id,
+      })
+        .then((res) => {
+          if (!res || !res.data || res.data.status === "error") {
+            console.log(
+              "Error occured when fetching message with ID " +
+                messages[messages.length - 1].parent_id
+            );
+            return;
+          }
+
+          setMessages((messages) => [...messages, res.data]);
+        })
+        .catch(function (error) {
+          console.log(error);
+        })
+        .finally(() => {
+          setLoadingMessageHistory(false);
+        });
+    }
+  }, [messages]);
+
+  // TODO: Potential issue when user recieves message from socket before this returns
+  useEffect(() => {
+    if (selectedChannelID) {
+      setLoadingMessageHistory(true);
+      setMessages([]);
+      AxiosInstance.post("/messages/latest", { channel_id: selectedChannelID })
+        .then(function (res) {
+          if (!res || !res.data || res.data.status === "error") {
+            console.log(
+              "Error occured when fetching latest message from channel " +
+                selectedChannelID.toString()
+            );
+            return;
+          }
+
+          setLoadingMessageHistory(false);
+          setMessages((messages) => [...messages, res.data]);
+        })
+        .catch(function (error) {
+          console.log(error);
+          setLoadingMessageHistory(false);
+        });
+    }
   }, [selectedChannelID]);
 
   return (

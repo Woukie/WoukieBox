@@ -6,7 +6,50 @@ const Channel = require("../schemas/channel");
 
 module.exports = function (app) {
   // Returns a message with the given ID if the users ID is in the servers user_ids list of the server the message was sent in
-  app.post("/messages/retrieve", authenticate, function (req, res, next) {});
+  app.post("/messages/retrieve", authenticate, async function (req, res, next) {
+    try {
+      const user = req.user;
+
+      //Todo sonme auth shit
+      const { message_id } = req.body;
+
+      if (!message_id)
+        return res.json({
+          status: "error",
+          message: "Message ID required",
+        });
+
+      const message = await Message.findById(message_id);
+
+      res.json(message);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Returns the latest message from a channel
+  app.post("/messages/latest", authenticate, async function (req, res, next) {
+    try {
+      const user = req.user;
+      const { channel_id } = req.body;
+
+      if (!channel_id)
+        return res.json({
+          status: "error",
+          message: "Channel ID required",
+        });
+
+      const channel = await Channel.findById(channel_id);
+
+      if (!channel.last_message_id) return res.json({});
+
+      const message = await Message.findById(channel.last_message_id);
+
+      res.json(message);
+    } catch (error) {
+      next(error);
+    }
+  });
 
   // Returns every server the user has joined in an object, where the key is the id, and the value is the server data, i.e {id here: {_id: 12312..., name: "wadaw", channel_ids: [123123..., 2312...], user_ids: [...]}}
   app.post("/servers/retrieve", authenticate, async function (req, res, next) {
@@ -63,7 +106,7 @@ module.exports = function (app) {
 
       res.json({ status: "success", server_id: server._id });
     } catch (error) {
-      next(error); // Handle errors using Express error handling middleware
+      next(error);
     }
   });
 

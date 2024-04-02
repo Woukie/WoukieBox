@@ -2,6 +2,7 @@ const Server = require("../schemas/server");
 const User = require("../schemas/user");
 const Channel = require("../schemas/channel");
 const Message = require("../schemas/message");
+const message = require("../schemas/message");
 
 module.exports = function (io, jwt) {
   // Auth middleware
@@ -102,14 +103,7 @@ module.exports = function (io, jwt) {
 
       newMessage.save();
 
-      io.to(data.channel_id).emit("message", {
-        _id: newMessage._id,
-        parent_id: newMessage.parent_id,
-        sender_id: newMessage.sender_id,
-        channel_id: newMessage._id,
-        sent_at: newMessage.sent_at,
-        content: newMessage.content,
-      });
+      io.to(data.channel_id).emit("message", newMessage);
 
       callback("success");
 
