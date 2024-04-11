@@ -121,6 +121,8 @@ export const WoukieProvider = ({ children }) => {
   // TODO: Make this load x messages when having scrolled the entire screen, could even be a "load more" button for simplicity on my part
   // TODO: Load in batches of x messages (change on server as well)
   useEffect(() => {
+    const originalChannel = selectedChannelID.toString(); // Just in case user has switched chjannels
+
     if (
       !loadingMessageHistory &&
       messages.length != 0 &&
@@ -132,6 +134,7 @@ export const WoukieProvider = ({ children }) => {
         message_id: messages[messages.length - 1].parent_id,
       })
         .then((res) => {
+          // triggers when loading final message, too drunk to fix rn, woirks anyway
           if (!res || !res.data || res.data.status === "error") {
             console.log(
               "Error occured when fetching message with ID " +
@@ -140,6 +143,17 @@ export const WoukieProvider = ({ children }) => {
             return;
           }
 
+          console.log("gAT");
+          console.log(originalChannel);
+          console.log(selectedChannelID);
+          console.log(messages[messages.length - 1]._id);
+          console.log(res.data.child_id);
+          if (
+            originalChannel != selectedChannelID ||
+            messages.length == 0 ||
+            messages[messages.length - 1]._id !== res.data.child_id
+          )
+            return;
           setMessages((messages) => [...messages, res.data]);
         })
         .catch(function (error) {
@@ -153,6 +167,7 @@ export const WoukieProvider = ({ children }) => {
 
   // TODO: Potential issue when user recieves message from socket before this returns
   useEffect(() => {
+    const originalChannel = selectedChannelID;
     if (selectedChannelID) {
       setLoadingMessageHistory(true);
       setMessages([]);
@@ -165,6 +180,8 @@ export const WoukieProvider = ({ children }) => {
             );
             return;
           }
+
+          if (originalChannel != selectedChannelID) return;
 
           setLoadingMessageHistory(false);
           setMessages((messages) => [...messages, res.data]);

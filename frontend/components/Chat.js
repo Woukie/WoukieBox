@@ -1,6 +1,7 @@
 import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 import {
   ActivityIndicator,
+  Avatar,
   Button,
   Surface,
   Text,
@@ -41,10 +42,47 @@ export default function Chat() {
   const { selectedChannelID, messages } = useWoukie();
 
   const renderMessage = (data) => {
-    const { _id, sender_id, channel_id, sent_at, content } = data.item;
+    const {
+      _id,
+      sender_id,
+      parent_id,
+      child_id,
+      channel_id,
+      sent_at,
+      content,
+    } = data.item;
+
+    const isHead =
+      !messages[data.index + 1] ||
+      (messages[data.index + 1] &&
+        messages[data.index + 1].sender_id != sender_id);
+
+    const isTail =
+      !messages[data.index - 1] ||
+      (messages[data.index - 1] &&
+        messages[data.index - 1].sender_id != sender_id);
     return (
-      <TouchableOpacity style={{ width: "100%" }} onPress={() => {}}>
-        <Text>{content}</Text>
+      <TouchableOpacity
+        style={{
+          paddingBottom: isTail ? 16 : 0,
+          paddingHorizontal: 16,
+          width: "100%",
+          flex: 1,
+          flexDirection: "row",
+        }}
+        onPress={() => {}}
+      >
+        {isHead && <Avatar.Text size={40} label={sender_id} />}
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "space-between",
+            paddingLeft: isHead ? 16 : 56,
+          }}
+        >
+          {isHead && <Text>{sender_id}</Text>}
+          <Text>{content}</Text>
+        </View>
       </TouchableOpacity>
     );
   };

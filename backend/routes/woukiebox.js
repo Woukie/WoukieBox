@@ -11,7 +11,7 @@ module.exports = function (app) {
       const user = req.user;
 
       //Todo sonme auth shit
-      const { message_id } = req.body;
+      const { message_id, count } = req.body;
 
       if (!message_id)
         return res.json({
@@ -20,6 +20,10 @@ module.exports = function (app) {
         });
 
       const message = await Message.findById(message_id);
+
+      for (let i = 0; i < count; i++) {
+        const element = array[i];
+      }
 
       res.json(message);
     } catch (error) {
